@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/DZENCode-test-task/static/css/main.4b5a1bd5.css",
+    "main.js": "/DZENCode-test-task/static/js/main.c8d1ddee.js",
+    "index.html": "/DZENCode-test-task/index.html",
+    "static/media/index.cjs": "/DZENCode-test-task/static/media/index.cd351d7c31d0d3fccf96.cjs",
+    "main.4b5a1bd5.css.map": "/DZENCode-test-task/static/css/main.4b5a1bd5.css.map",
+    "main.c8d1ddee.js.map": "/DZENCode-test-task/static/js/main.c8d1ddee.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4b5a1bd5.css",
+    "static/js/main.c8d1ddee.js"
+  ]
+}
