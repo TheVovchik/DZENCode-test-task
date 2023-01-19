@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Captcha } from '../types/Captcha';
 
-const BASE_URL = 'https://dzen-task.onrender.com/data';
+const BASE_URL = 'https://dzen-task.onrender.com/v1/data';
 
 export const generateCaptcha = async () => {
   return axios.get<Captcha>(`${BASE_URL}/captcha`)

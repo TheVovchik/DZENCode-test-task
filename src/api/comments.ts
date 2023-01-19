@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Comment } from '../types/Comment';
 
-const BASE_URL = 'https://dzen-task.onrender.com/data';
+const BASE_URL = 'https://dzen-task.onrender.com/v1/data';
 
 export const postComment = (comment: FormData) => {
   return axios.post(
