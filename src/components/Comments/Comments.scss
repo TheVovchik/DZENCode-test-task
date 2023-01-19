@@ -1,0 +1,30 @@
+.article {
+  padding-bottom: 20px;
+}
+
+.quoted-reply {
+  position: relative;
+  padding: 8px;
+  border: 1px solid ghostwhite;
+  // background-color: rgba(218, 167, 207, 0.288);
+
+  &::before {
+    content: "\201C"; /*Unicode for Left Double Quote*/
+    position: absolute;
+    color:#000; 
+    font-size: 40px;
+    line-height: 30px;
+    top: -10px;
+    left: -6px;
+  }
+
+  &::after {
+    content: "\201D"; /*Unicode for Right Double Quote*/
+    position: absolute;
+    color:#000; 
+    font-size: 40px;
+    line-height: 30px;
+    bottom: -20px;
+    right: -6px;
+  }
+}

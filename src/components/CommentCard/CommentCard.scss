@@ -1,0 +1,78 @@
+.comment-card {
+  margin-bottom: 10px;
+  border: 1px solid whitesmoke;
+
+  box-shadow: 2px 2px 5px gray;
+  border-radius: 8px;
+
+  &__header {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+
+    background-color: grey;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+
+  &__left {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__time {
+    color: white;
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  &__plus-minus {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  &__user {
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 27px;
+  }
+
+  &__button-box {
+    display: flex;
+    align-items: center;
+    padding-left: 11px;
+  }
+
+  &__quotes {
+    cursor: pointer;
+
+    &:hover {
+      background-color: grey;
+      color: white;
+    }
+  }
+
+  &__rating {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+
+    &--green {
+      color: lightgreen;
+    }
+
+    &--red {
+      color: red;
+    }
+  }
+}
