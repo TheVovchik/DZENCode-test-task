@@ -79,9 +79,11 @@ export const CommentCard: FC<Props> = ({
   const handleVote = async (action: Vote) => {
     if (!canVote) {
       let newRating = comment.rating;
-      const newVotes = [...comment.votes];
+      const newVotes = comment.votes.length !== 0 ? [...comment.votes] : [];
 
       newVotes.push(ip);
+
+      console.log(newVotes);
 
       if (action === Vote.PLUS) {
         newRating += 1;
