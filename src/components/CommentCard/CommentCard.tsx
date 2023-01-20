@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   FC, useEffect, useState,
 } from 'react';
@@ -82,8 +81,6 @@ export const CommentCard: FC<Props> = ({
       const newVotes = comment.votes.length !== 0 ? [...comment.votes] : [];
 
       newVotes.push(ip);
-
-      console.log(newVotes);
 
       if (action === Vote.PLUS) {
         newRating += 1;

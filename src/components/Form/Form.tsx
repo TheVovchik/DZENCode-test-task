@@ -5,6 +5,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import $ from 'jquery';
+import sanitizeHtml from 'sanitize-html';
 import { generateCaptcha } from '../../api/captcha';
 import './Form.scss';
 import { PreviewModal } from '../PreviewModal';
@@ -51,6 +52,20 @@ export const Form: FC<Props> = ({
     return hasError;
   };
 
+  const sanitaizeMessage = () => {
+    const clean = sanitizeHtml(message, {
+      allowedTags: ['code', 'i', 'strong', 'a', 'br', 'p'],
+      allowedAttributes: {
+        a: ['href', 'title'],
+      },
+      allowedClasses: {
+        p: ['quoted-reply'],
+      },
+    });
+
+    return clean;
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -71,10 +86,12 @@ export const Form: FC<Props> = ({
           formData.append('homepage', homepage);
         }
 
+        const text = sanitaizeMessage();
+
         formData.append('postId', `${postId}`);
         formData.append('userName', userName);
         formData.append('email', email);
-        formData.append('text', message);
+        formData.append('text', text);
         formData.append('rating', '0');
         formData.append('votes', '[]');
 
@@ -294,7 +311,7 @@ export const Form: FC<Props> = ({
         </div>
 
         <div className="field">
-          <Tooltip title="<a href=”” title=””> </a>">
+          <Tooltip title="[a]">
             <IconButton onClick={() => (
               addTag(['<a href=”” title=”” target="blanc">', '</a>'])
             )}
@@ -303,19 +320,19 @@ export const Form: FC<Props> = ({
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="<code> </code>">
+          <Tooltip title="[code]">
             <IconButton onClick={() => addTag(['<code>', '</code>'])}>
               <CodeIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="<i> </i>">
+          <Tooltip title="[i]">
             <IconButton onClick={() => addTag(['<i>', '</i>'])}>
               <FormatItalicIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="<strong> </strong>">
+          <Tooltip title="[strong]">
             <IconButton onClick={() => addTag(['<strong>', '</strong>'])}>
               <FormatBoldIcon />
             </IconButton>

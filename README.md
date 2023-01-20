@@ -1,46 +1,38 @@
-# Getting Started with Create React App
+# SPA Comments
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## API DATA
 
-## Available Scripts
+[API DOCS](https://dzen-task.onrender.com/v1/static)
 
-In the project directory, you can run:
+DataBase: ```MySQL (PlanetScale.com)```
 
-### `npm start`
+Server: ```render.com``` (need ~2 minutes to wake up if have no action on last 30 minutes)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## APP FUNCTIONALITY
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+> Form fields
+- User Name - one word 3 to 19 symbols (latin or number) length (!required)
+- E-mail - custom validation (!required)
+- Homepage - input type ulr (optional)
+- CAPTCHA - randomly generated in server SVG image with text (!required):
+  1. can be refreshed with ```refresh``` button.
+- text - textarea with ```[i], [strong], [code], [a]``` buttons to add specific style. if user quoted previous message (reply open clean form, quotes open form with text of previous comment):
+  1.  we can select specific text and wrap up selection with tag we need.
+  1.  review message with ```preview``` button.
 
-### `npm test`
+> Comments
+- form have a postId to connect comment with some post and reuse component (can be added an api call by postId etc.).
+- we can answer comment on any level.
+- we can rate comment (one ip one mark).
+- comments levels are shown by using corresponding indentations.
+- comments are connected by the double side linked list logic.
+- to build comments structure was implemented method deep first to left(dftl).
+- by default comments will appear by date.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### NEEDS TO
+- add image(logo)/file upload with all checks and additional actions.
+- pagination;
+- comment sorting;
+- refactoring, decomposition of the components to the smaller parts;
+- logic splitting in some functions after refactoring;
+- move general logic to global storage (context or redux, hook);
