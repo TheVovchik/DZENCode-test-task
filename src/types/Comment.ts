@@ -1,14 +1,14 @@
 export interface Comment {
   id: number,
   postId: number,
-  nextId: number[] | null,
+  nextIds: number[] | null,
   prevId: number | null,
   rating: number,
   userName: string,
   email: string,
   homepage: string | null,
   text: string,
-  voted: string[],
+  votes: string[],
   createdAt: Date,
   updatedAt: Date
 }

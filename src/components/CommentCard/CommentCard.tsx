@@ -30,7 +30,7 @@ export const CommentCard: FC<Props> = ({
   const [comment, setComment] = useState<Comment>(commentData);
   const [isForm, setIsForm] = useState(false);
   const [quoted, setQuoted] = useState('');
-  const canVote = comment.voted.includes(ip);
+  const canVote = comment.votes.includes(ip);
 
   const day = new Date(comment.createdAt)
     .toLocaleDateString()
@@ -79,9 +79,9 @@ export const CommentCard: FC<Props> = ({
   const handleVote = async (action: Vote) => {
     if (!canVote) {
       let newRating = comment.rating;
-      const newVoted = [...comment.voted];
+      const newVotes = [...comment.votes];
 
-      newVoted.push(ip);
+      newVotes.push(ip);
 
       if (action === Vote.PLUS) {
         newRating += 1;
@@ -92,7 +92,7 @@ export const CommentCard: FC<Props> = ({
       }
 
       try {
-        const actComment = await patchComment(comment.id, newRating, newVoted);
+        const actComment = await patchComment(comment.id, newRating, newVotes);
 
         setComment(actComment);
       } catch (error) {
@@ -139,17 +139,20 @@ export const CommentCard: FC<Props> = ({
           </div>
         </div>
         <div className="comment-card__right">
-          {!canVote && (
-            <button
-              type="button"
-              className="comment-card__plus-minus"
-              onClick={() => handleVote(Vote.PLUS)}
-            >
-              <NorthIcon
-                sx={{ color: 'white' }}
-              />
-            </button>
-          )}
+
+          <button
+            type="button"
+            className="comment-card__plus-minus"
+            onClick={() => handleVote(Vote.PLUS)}
+            disabled={canVote}
+          >
+            <NorthIcon
+              sx={{
+                color: canVote ? 'grey' : 'white',
+                cursor: canVote ? 'initial' : 'pointer',
+              }}
+            />
+          </button>
 
           <span
             className={cn(
@@ -163,17 +166,20 @@ export const CommentCard: FC<Props> = ({
             {comment.rating}
           </span>
 
-          {!canVote && (
-            <button
-              type="button"
-              className="comment-card__plus-minus"
-              onClick={() => handleVote(Vote.MINUS)}
-            >
-              <SouthIcon
-                sx={{ color: 'white' }}
-              />
-            </button>
-          )}
+          <button
+            type="button"
+            className="comment-card__plus-minus"
+            onClick={() => handleVote(Vote.MINUS)}
+            disabled={canVote}
+          >
+            <SouthIcon
+              sx={{
+                color: canVote ? 'grey' : 'white',
+                cursor: canVote ? 'initial' : 'pointer',
+              }}
+            />
+          </button>
+
         </div>
       </div>
 

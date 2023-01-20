@@ -76,7 +76,7 @@ export const Form: FC<Props> = ({
         formData.append('email', email);
         formData.append('text', message);
         formData.append('rating', '0');
-        formData.append('voted', '[]');
+        formData.append('votes', '[]');
 
         await postComment(formData);
         refreshComments();

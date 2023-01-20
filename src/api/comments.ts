@@ -23,9 +23,9 @@ export const getComments = () => {
 };
 
 export const patchComment = (
-  id: number, rating: number, newVoted: string[],
+  id: number, rating: number, newVotes: string[],
 ) => {
-  return axios.patch<Comment>(`${BASE_URL}/${id}`, { rating, newVoted })
+  return axios.patch<Comment>(`${BASE_URL}/${id}`, { rating, newVotes })
     .then(response => response.data)
     .catch((error) => {
       throw new Error(error);

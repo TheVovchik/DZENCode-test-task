@@ -74,8 +74,8 @@ export const Comments: FC = () => {
           />,
         );
 
-        if (comment.nextId) {
-          path.push(comment.nextId);
+        if (comment.nextIds) {
+          path.push(comment.nextIds);
           let currentId = path[path.length - 1].shift();
 
           while (currentId !== 0) {
@@ -92,8 +92,8 @@ export const Comments: FC = () => {
                 />,
               );
 
-              if (current.nextId) {
-                path.push(current.nextId);
+              if (current.nextIds) {
+                path.push(current.nextIds);
               }
 
               while (path.length > 0) {
