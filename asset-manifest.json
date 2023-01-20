@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/DZENCode-test-task/static/css/main.5b114e64.css",
-    "main.js": "/DZENCode-test-task/static/js/main.9c4f0410.js",
+    "main.js": "/DZENCode-test-task/static/js/main.f97df8b2.js",
     "index.html": "/DZENCode-test-task/index.html",
     "static/media/index.cjs": "/DZENCode-test-task/static/media/index.cd351d7c31d0d3fccf96.cjs",
     "main.5b114e64.css.map": "/DZENCode-test-task/static/css/main.5b114e64.css.map",
-    "main.9c4f0410.js.map": "/DZENCode-test-task/static/js/main.9c4f0410.js.map"
+    "main.f97df8b2.js.map": "/DZENCode-test-task/static/js/main.f97df8b2.js.map"
   },
   "entrypoints": [
     "static/css/main.5b114e64.css",
-    "static/js/main.9c4f0410.js"
+    "static/js/main.f97df8b2.js"
   ]
 }
