@@ -2,6 +2,24 @@
 
 [DEMO-LINK](https://thevovchik.github.io/DZENCode-test-task)
 
+> To start project
+- `Fork` the repository
+- `Clone` the forked repo
+- Run `npm install` to install the dependencies
+- Run `npm start` to run a development server at http://localhost:3000 (If you need to stop the server press `ctrl + c` in the terminal window)
+
+> To develop changes in project
+- `Fork` the repository
+- `Clone` the forked repo
+- Run `npm install` to install the dependencies
+- Create a branch for you solution (e.g. `git checkout -b develop`)
+- Run `npm start` to run a development server at http://localhost:3000 (If you need to stop the server press `ctrl + c` in the terminal window)
+- Write the code inside the `src/` folder
+- `add`, `commit` and `push` all the recent changes
+- Put your `Github username` to `homepage` (`https://<username>.github.io/DZENCode-test-task`) in `package.json`
+- Run `npm run deploy` to publish your solution to `Github pages`
+- Create a `Pull Request` (`PR`) from `the-forked-repo/develop` to `the-original-repo/master`
+
 ## API DATA
 
 [API DOCS](https://dzen-task.onrender.com/v1/static)
