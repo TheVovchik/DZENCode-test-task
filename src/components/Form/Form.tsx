@@ -1,80 +1,58 @@
-import React, { FC, useState, useEffect } from 'react';
-import { IconButton, Tooltip } from '@mui/material';
-import LinkIcon from '@mui/icons-material/Link';
-import CodeIcon from '@mui/icons-material/Code';
-import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-import FormatBoldIcon from '@mui/icons-material/FormatBold';
-import $ from 'jquery';
-import sanitizeHtml from 'sanitize-html';
-import { generateCaptcha } from '../../api/captcha';
-import './Form.scss';
+import React, {
+  FC, useContext, useState,
+} from 'react';
+import * as EmailValidator from 'email-validator';
+import axios from 'axios';
 import { PreviewModal } from '../PreviewModal';
 import { userNamePattern } from '../../utils/userName';
-import { Captcha } from '../../types/Captcha';
 import { postComment } from '../../api/comments';
+import { sanitaizeMessage } from '../../utils/sanitaizeMessage';
+import { SVGCaptcha } from './SVGCaptcha';
+import { FormContext } from '../FormContext';
+import { UserName } from './UserName';
+import { Email } from './Email';
+import './Form.scss';
+import { Homepage } from './Homepage';
+import { validateUrl } from '../../utils/validateUrl';
+import { FormControl } from './FormControl';
+import { Textarea } from './Textarea';
+import { CommentsContext } from '../CommentsContext';
 
 type Props = {
   postId: number,
   prevId: number | null,
-  refreshComments: () => void,
-  quoted: string,
+  closeForm: () => void,
 };
 
 export const Form: FC<Props> = ({
-  postId, prevId, refreshComments, quoted,
+  postId, prevId, closeForm,
 }) => {
-  const [userName, setUserName] = useState('');
-  const [isUserNameError, setIsUserNameError] = useState(false);
-  const [email, setEmail] = useState('');
-  const [homepage, setHomepage] = useState('');
-  const [captcha, setCaptcha] = useState<Captcha | null>(null);
-  const [captchaValue, setCaptchaValue] = useState('');
-  const [isCaptchaError, setIsCaptchaError] = useState(false);
-  const [message, setMessage] = useState(quoted);
-  const [selectedCoords, setSelectedCoords] = useState<number[]>([0, 0]);
   const [isActive, setIsActive] = useState(false);
+  const {
+    captcha,
+    captchaValue,
+    userName,
+    email,
+    homepage,
+    message,
+  } = useContext(FormContext);
 
-  const loadCaptcha = async () => {
-    try {
-      const newCaptcha = await generateCaptcha();
+  const { refreshComments } = useContext(CommentsContext);
 
-      setCaptcha(newCaptcha);
-    } catch (error) {
-      throw new Error();
-    }
-  };
+  const checkData = () => {
+    const checkCaptcha = captcha?.text === captchaValue;
+    const checkName = userNamePattern.test(userName);
+    const checkEmail = EmailValidator.validate(email);
+    const checkUrl = validateUrl(homepage);
 
-  const validateCaptcha = () => {
-    const hasError = captcha?.text === captchaValue;
-
-    setIsCaptchaError(!hasError);
-
-    return hasError;
-  };
-
-  const sanitaizeMessage = () => {
-    const clean = sanitizeHtml(message, {
-      allowedTags: ['code', 'i', 'strong', 'a', 'br', 'p'],
-      allowedAttributes: {
-        a: ['href', 'title'],
-      },
-      allowedClasses: {
-        p: ['quoted-reply'],
-      },
-    });
-
-    return clean;
+    return checkCaptcha && checkName && checkEmail && checkUrl;
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const couldSubmit = checkData();
 
-    const checkResult = validateCaptcha();
-    const checkName = userNamePattern.test(userName);
-
-    setIsUserNameError(!checkName);
-
-    if (checkResult && checkName) {
+    if (couldSubmit) {
       try {
         const formData = new FormData();
 
@@ -86,148 +64,31 @@ export const Form: FC<Props> = ({
           formData.append('homepage', homepage);
         }
 
-        const text = sanitaizeMessage();
+        const text = sanitaizeMessage(message);
 
         formData.append('postId', `${postId}`);
         formData.append('userName', userName);
         formData.append('email', email);
         formData.append('text', text);
         formData.append('rating', '0');
-        formData.append('votes', '[]');
+        formData.append('votes', '');
 
         await postComment(formData);
+        closeForm();
         refreshComments();
       } catch (error) {
-        throw new Error();
+        if (axios.isAxiosError(error)) {
+          throw error;
+        } else {
+          throw new Error('different error than axios');
+        }
       }
     }
   };
 
-  const handleUserNameInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUserName(event.target.value);
-
-    const checkName = userNamePattern.test(event.target.value);
-
-    setIsUserNameError(!checkName);
-  };
-
-  const handleEmailInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
-
-  const handleHomepageInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHomepage(event.target.value);
-  };
-
-  const handleCaptchaInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCaptchaValue(event.target.value);
-    setIsCaptchaError(false);
-  };
-
-  const handleMessageChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    const input = event.target.value;
-
-    setMessage(input);
-  };
-
-  const handleSelect = () => {
-    const cursorStart = $('textarea').prop('selectionStart');
-    const cursorEnd = $('textarea').prop('selectionEnd');
-
-    setSelectedCoords([cursorStart, cursorEnd]);
-  };
-
-  const addTag = (tag: string[]) => {
-    if (selectedCoords.some(coord => coord !== 0)) {
-      const [openTag, closeTag] = tag;
-
-      setMessage(current => {
-        const modified = current
-          .split('');
-
-        modified
-          .splice(selectedCoords[0], 0, openTag);
-
-        modified
-          .splice(selectedCoords[1] + 1, 0, closeTag);
-
-        return modified.join('');
-      });
-
-      $('textarea')
-        .prop('selectionEnd',
-          selectedCoords[1] + openTag.length + closeTag.length);
-    } else {
-      const allTag = tag.join(' ');
-
-      setMessage(current => {
-        const cursorStart = $('textarea').prop('selectionStart');
-
-        const modified = current
-          .split('');
-
-        modified
-          .splice(cursorStart, 0, allTag);
-
-        return modified.join('');
-      });
-
-      $('textarea').prop('selectionEnd', selectedCoords[1] + allTag.length);
-    }
-  };
-
-  const handleNewLine = (event: React.KeyboardEvent) => {
-    const cursorStart = $('textarea').prop('selectionStart');
-
-    if (event.key === 'Enter') {
-      setMessage(current => {
-        const modified = current
-          .split('');
-
-        modified
-          .splice(cursorStart + 1, 0, '<br>');
-
-        return modified.join('');
-      });
-
-      $('textarea').prop('selectionEnd', selectedCoords[1] + 5);
-    }
-  };
-
-  const changeModalStatus = (status: boolean) => {
+  const showModal = (status: boolean) => {
     setIsActive(status);
   };
-
-  const refreshCaptcha = () => {
-    loadCaptcha();
-    setCaptchaValue('');
-    setIsCaptchaError(false);
-  };
-
-  useEffect(() => {
-    loadCaptcha();
-  }, []);
-
-  const checkFields = () => {
-    const hasSubmit = email.length === 0
-      || userName.length === 0
-      || captchaValue.length === 0
-      || message.length === 0
-      || isCaptchaError
-      || isUserNameError;
-
-    return hasSubmit;
-  };
-
-  useEffect(() => {
-    const captchaDiv = $('.form__captcha-pic');
-
-    if (captcha && captchaDiv) {
-      captchaDiv.html(captcha.data);
-    }
-  }, [captcha]);
 
   return (
     <>
@@ -235,146 +96,25 @@ export const Form: FC<Props> = ({
         className="form"
         onSubmit={handleSubmit}
       >
-        <div className="field">
-          <label htmlFor="userName" className="label">Login</label>
-          <div className="control">
-            <input
-              id="userName"
-              className="input"
-              type="text"
-              value={userName}
-              onChange={handleUserNameInput}
-              required
-            />
-          </div>
+        <UserName />
 
-          {isUserNameError && (
-            <div className="form__error">
-              can contain only numbers and
-              latin letters and to have at least 3 symbols length
-            </div>
-          )}
-        </div>
+        <Email />
 
-        <div className="field">
-          <label htmlFor="email" className="label">Email</label>
-          <div className="control">
-            <input
-              id="email"
-              className="input"
-              type="email"
-              placeholder="e.g. alex@example.com"
-              value={email}
-              onChange={handleEmailInput}
-              required
-            />
-          </div>
-        </div>
+        <Homepage />
 
-        <div className="field">
-          <label htmlFor="homepage" className="label">Homepage</label>
-          <div className="control">
-            <input
-              id="homepage"
-              className="input"
-              type="url"
-              placeholder="http://example.com"
-              value={homepage}
-              onChange={handleHomepageInput}
-            />
-          </div>
-        </div>
+        <SVGCaptcha />
 
-        <div className="form__captcha-pic" />
-        {isCaptchaError && (
-          <div className="form__error">wrong captcha</div>
-        )}
+        <Textarea />
 
-        <div className="field form__captcha-input">
-          <div className="control">
-            <input
-              className="input"
-              type="text"
-              value={captchaValue}
-              onChange={handleCaptchaInput}
-              required
-            />
-          </div>
-
-          <button
-            type="button"
-            className="button is-success is-light"
-            onClick={refreshCaptcha}
-          >
-            Refresh
-          </button>
-        </div>
-
-        <div className="field">
-          <Tooltip title="[a]">
-            <IconButton onClick={() => (
-              addTag(['<a href=”” title=”” target="blanc">', '</a>'])
-            )}
-            >
-              <LinkIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="[code]">
-            <IconButton onClick={() => addTag(['<code>', '</code>'])}>
-              <CodeIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="[i]">
-            <IconButton onClick={() => addTag(['<i>', '</i>'])}>
-              <FormatItalicIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="[strong]">
-            <IconButton onClick={() => addTag(['<strong>', '</strong>'])}>
-              <FormatBoldIcon />
-            </IconButton>
-          </Tooltip>
-
-          <div className="control">
-            <textarea
-              className="textarea"
-              placeholder="Input your message"
-              value={message}
-              onMouseUp={handleSelect}
-              onChange={handleMessageChange}
-              onKeyDown={handleNewLine}
-              required
-            />
-          </div>
-        </div>
-
-        <div className="form__control">
-          <button
-            type="button"
-            className="button is-warning"
-            onClick={() => changeModalStatus(true)}
-            disabled={message.length === 0}
-          >
-            Preview
-          </button>
-
-          <button
-            type="submit"
-            className="button is-primary"
-            disabled={checkFields()}
-          >
-            Post
-          </button>
-        </div>
+        <FormControl
+          showModal={showModal}
+        />
       </form>
 
       <PreviewModal
         isActive={isActive}
         message={message}
-        changeModalStatus={changeModalStatus}
+        changeModalStatus={showModal}
       />
     </>
   );

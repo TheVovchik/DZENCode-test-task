@@ -1,24 +1,8 @@
 .form {
   padding: 20px;
 
-  &__captcha-pic {
-    width: 150px;
-    height: 50px;
-  }
-
-  &__captcha-input {
-    display: flex;
-    gap: 10px;
-    width: 250px;
-  }
-
-  &__control {
-    display: flex;
-    gap: 20px;
-  }
-
   &__error {
-    color: red;
+    color: darkred;
     padding: 4px;
   }
 }

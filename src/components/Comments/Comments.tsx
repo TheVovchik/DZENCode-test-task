@@ -1,133 +1,46 @@
-/* eslint-disable @typescript-eslint/no-loop-func */
 import {
-  FC, useState, useEffect, Fragment,
+  FC, useState, Fragment, useContext,
 } from 'react';
-import { Button } from '@mui/material';
+import { Button, IconButton, Tooltip } from '@mui/material';
 import './Comments.scss';
 import 'bulma/css/bulma.min.css';
-import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import TablePagination from '@mui/material/TablePagination';
+import StraightIcon from '@mui/icons-material/Straight';
+import ContactsIcon from '@mui/icons-material/Contacts';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import { Form } from '../Form';
-import { getComments } from '../../api/comments';
-import { Comment } from '../../types/Comment';
-import { CommentCard } from '../CommentCard/CommentCard';
-import { getCurrentIP } from '../../api/ip';
+import { FormProvider } from '../FormContext';
+import { CommentsContext } from '../CommentsContext';
 
 export const Comments: FC = () => {
-  const [isForm, setIsForm] = useState(false);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [readyComments, setReadyComments] = useState<JSX.Element[][]>([]);
-  const [ip, setIp] = useState('');
+  const { readyComments } = useContext(CommentsContext);
+  const [isPrimaryForm, setIsPrimaryForm] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const showForm = () => {
-    setIsForm(current => !current);
+    setIsPrimaryForm(current => !current);
   };
 
-  const loadComments = async () => {
-    try {
-      const commentsFromApi = await getComments();
-
-      setComments(commentsFromApi);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw error;
-      } else {
-        throw new Error('different error than axios');
-      }
-    }
+  const closeForm = () => {
+    setIsPrimaryForm(false);
   };
 
-  const loadIP = async () => {
-    try {
-      const currentIp = await getCurrentIP();
-
-      setIp(currentIp.IPv4);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw error;
-      } else {
-        throw new Error('different error than axios');
-      }
-    }
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setPage(newPage);
   };
 
-  const refreshComments = () => {
-    loadComments();
-    setIsForm(false);
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
-
-  const parseComments = () => {
-    const parsedComments: JSX.Element[][] = [];
-
-    comments.forEach((comment, _index, fullData) => {
-      if (comment.prevId === null) {
-        const initialMargin = 0;
-        const buffer: JSX.Element[] = [];
-        const path = [];
-
-        buffer.push(
-          <CommentCard
-            margin={`${initialMargin}`}
-            commentData={comment}
-            ip={ip}
-            refreshComments={refreshComments}
-          />,
-        );
-
-        if (comment.nextIds) {
-          path.push(comment.nextIds);
-          let currentId = path[path.length - 1].shift();
-
-          while (currentId !== 0) {
-            const current = fullData
-              .find(data => data.id === currentId);
-
-            if (current) {
-              buffer.push(
-                <CommentCard
-                  margin={`${initialMargin + 30 * path.length}px`}
-                  commentData={current}
-                  ip={ip}
-                  refreshComments={refreshComments}
-                />,
-              );
-
-              if (current.nextIds) {
-                path.push(current.nextIds);
-              }
-
-              while (path.length > 0) {
-                if (path[path.length - 1].length === 0) {
-                  path.pop();
-                } else {
-                  break;
-                }
-              }
-
-              if (path.length !== 0) {
-                currentId = path[path.length - 1].shift();
-              } else {
-                currentId = 0;
-              }
-            }
-          }
-        }
-
-        parsedComments.push(buffer);
-      }
-
-      setReadyComments(parsedComments);
-    });
-  };
-
-  useEffect(() => {
-    loadIP();
-    loadComments();
-  }, []);
-
-  useEffect(() => {
-    parseComments();
-  }, [comments]);
 
   return (
     <div>
@@ -143,46 +56,78 @@ export const Comments: FC = () => {
         deleniti minima porro aut soluta, quae temporibus necessitatibus iusto
         ad dolorum deserunt commodi doloribus natus, repellat fugiat delectus
         ratione tempore reiciendis obcaecati. Consectetur omnis modi, quia illum
-        magni facere soluta quos explicabo beatae. Quas itaque maxime qui
-        dolorem. Architecto reprehenderit, quod vero voluptatum nam inventore
-        dolorem iusto atque tenetur, ab deserunt adipisci eum natus maiores,
-        unde hic sunt facilis mollitia accusantium voluptas nobis delectus. Fuga
-        consectetur similique et, praesentium ut inventore aut est ullam in
-        voluptates at cupiditate dolor non doloribus dolorum minima assumenda
-        maxime mollitia nemo laudantium. Incidunt, et, inventore harum deleniti
-        odit repudiandae cumque, aspernatur laboriosam provident ullam expedita
-        iusto quam perspiciatis veniam vero laudantium sunt esse quis vel libero
-        fugiat nihil facere eius. Quia, ipsum.
+        magni facere soluta quos explicabo beatae.
       </div>
 
       <Button
         variant="contained"
         size="large"
         sx={{
-          backgroundColor: isForm ? 'grey' : 'primary',
+          backgroundColor: isPrimaryForm ? 'grey' : 'primary',
           marginBottom: '20px',
         }}
         onClick={showForm}
       >
-        {isForm ? 'Close form' : 'Leave a comment'}
+        {isPrimaryForm ? 'Close form' : 'Leave a comment'}
       </Button>
 
-      {isForm && (
-        <Form
-          postId={1}
-          prevId={null}
-          refreshComments={refreshComments}
-          quoted=""
-        />
+      {isPrimaryForm && (
+        <FormProvider quoted="">
+          <Form
+            postId={1}
+            prevId={null}
+            closeForm={closeForm}
+          />
+        </FormProvider>
       )}
 
-      {readyComments.map((comment) => {
-        return (
-          <Fragment key={uuidv4()}>
-            {comment}
-          </Fragment>
-        );
-      })}
+      {readyComments.length > 0 && (
+        <div className="control">
+          <div className="control__sorting">
+            <Tooltip title="Sort by login">
+              <IconButton>
+                <ContactsIcon />
+                <StraightIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Sort by date">
+              <IconButton>
+                <CalendarMonthIcon />
+                <StraightIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Sort by rating">
+              <IconButton>
+                <ThumbUpOffAltIcon />
+                <StraightIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+
+          <TablePagination
+            component="div"
+            count={readyComments.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Comments per page:"
+            rowsPerPageOptions={[5, 10, 15, 20, 25]}
+          />
+        </div>
+      )}
+
+      {readyComments
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        .map((comment) => {
+          return (
+            <Fragment key={uuidv4()}>
+              {comment}
+            </Fragment>
+          );
+        })}
     </div>
   );
 };

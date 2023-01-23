@@ -15,16 +15,16 @@ import './CommentCard.scss';
 import { Form } from '../Form';
 import { Vote } from '../../types/Vote';
 import { patchComment } from '../../api/comments';
+import { FormProvider } from '../FormContext';
 
 type Props = {
   margin: string,
   commentData: Comment,
   ip: string,
-  refreshComments: () => void,
 };
 
 export const CommentCard: FC<Props> = ({
-  margin, commentData, ip, refreshComments,
+  margin, commentData, ip,
 }) => {
   const [comment, setComment] = useState<Comment>(commentData);
   const [isForm, setIsForm] = useState(false);
@@ -70,8 +70,7 @@ export const CommentCard: FC<Props> = ({
     setQuoted('');
   };
 
-  const updateComment = () => {
-    refreshComments();
+  const closeForm = () => {
     setIsForm(false);
   };
 
@@ -217,12 +216,13 @@ export const CommentCard: FC<Props> = ({
       </div>
 
       {isForm && (
-        <Form
-          postId={1}
-          prevId={comment.id}
-          refreshComments={updateComment}
-          quoted={quoted}
-        />
+        <FormProvider quoted={quoted}>
+          <Form
+            postId={1}
+            prevId={comment.id}
+            closeForm={closeForm}
+          />
+        </FormProvider>
       )}
     </div>
   );
