@@ -1,24 +1,103 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-loop-func */
 import {
-  FC, useState, Fragment, useContext,
+  FC, useState, Fragment, useContext, useEffect,
 } from 'react';
-import { Button, IconButton, Tooltip } from '@mui/material';
+import { Button } from '@mui/material';
 import './Comments.scss';
 import 'bulma/css/bulma.min.css';
 import { v4 as uuidv4 } from 'uuid';
-import TablePagination from '@mui/material/TablePagination';
-import StraightIcon from '@mui/icons-material/Straight';
-import ContactsIcon from '@mui/icons-material/Contacts';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import { Form } from '../Form';
 import { FormProvider } from '../FormContext';
 import { CommentsContext } from '../CommentsContext';
+import { CommentCard } from '../CommentCard';
+import { ControlPanel } from '../CommentsContext/ControlPanel';
+// import { sortComments } from '../../utils/sortComments';
 
 export const Comments: FC = () => {
-  const { readyComments } = useContext(CommentsContext);
+  const {
+    comments, ip, sortBy, order,
+  } = useContext(CommentsContext);
+  const [readyComments, setReadyComments] = useState<JSX.Element[][]>([]);
   const [isPrimaryForm, setIsPrimaryForm] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const parseComments = () => {
+    const parsedComments: JSX.Element[][] = [];
+
+    console.log('start');
+    // const sortedComments = sortComments(comments, sortBy, order);
+
+    comments.forEach((comment, index, fullData) => {
+      console.log('ForEach entered', index);
+      console.log(parsedComments);
+
+      if (comment.prevId === null) {
+        const initialMargin = 0;
+        const buffer: JSX.Element[] = [];
+        const path = [];
+
+        buffer.push(
+          <CommentCard
+            margin={`${initialMargin}`}
+            commentData={comment}
+            ip={ip}
+            key={uuidv4()}
+          />,
+        );
+
+        if (comment.nextIds) {
+          path.push(comment.nextIds);
+          let currentId = path[path.length - 1].shift();
+
+          while (currentId !== 0) {
+            const current = fullData
+              .find(data => data.id === currentId);
+
+            if (current) {
+              buffer.push(
+                <CommentCard
+                  margin={`${initialMargin + 30 * path.length}px`}
+                  commentData={current}
+                  ip={ip}
+                  key={uuidv4()}
+                />,
+              );
+
+              if (current.nextIds) {
+                path.push(current.nextIds);
+              }
+
+              while (path.length > 0) {
+                if (path[path.length - 1].length === 0) {
+                  path.pop();
+                } else {
+                  break;
+                }
+              }
+
+              if (path.length !== 0) {
+                currentId = path[path.length - 1].shift();
+              } else {
+                currentId = 0;
+              }
+            }
+          }
+        }
+
+        parsedComments.push(buffer);
+      }
+
+      console.log('ForEach leaved', index);
+    });
+
+    console.log('parsed');
+
+    setReadyComments(parsedComments);
+    console.log('end');
+  };
 
   const showForm = () => {
     setIsPrimaryForm(current => !current);
@@ -41,6 +120,12 @@ export const Comments: FC = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  useEffect(() => {
+    if (comments) {
+      parseComments();
+    }
+  }, [comments]);
 
   return (
     <div>
@@ -82,41 +167,13 @@ export const Comments: FC = () => {
       )}
 
       {readyComments.length > 0 && (
-        <div className="control">
-          <div className="control__sorting">
-            <Tooltip title="Sort by login">
-              <IconButton>
-                <ContactsIcon />
-                <StraightIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Sort by date">
-              <IconButton>
-                <CalendarMonthIcon />
-                <StraightIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Sort by rating">
-              <IconButton>
-                <ThumbUpOffAltIcon />
-                <StraightIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-
-          <TablePagination
-            component="div"
-            count={readyComments.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Comments per page:"
-            rowsPerPageOptions={[5, 10, 15, 20, 25]}
-          />
-        </div>
+        <ControlPanel
+          page={page}
+          rowsPerPage={rowsPerPage}
+          count={readyComments.length}
+          handleChangePage={handleChangePage}
+          handleChangeRowsPerPage={handleChangeRowsPerPage}
+        />
       )}
 
       {readyComments

@@ -7,8 +7,8 @@ import cn from 'classnames';
 import axios from 'axios';
 import Avatar from '@mui/material/Avatar';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
-import NorthIcon from '@mui/icons-material/North';
-import SouthIcon from '@mui/icons-material/South';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import Button from '@mui/material/Button';
 import { Comment } from '../../types/Comment';
 import './CommentCard.scss';
@@ -144,7 +144,7 @@ export const CommentCard: FC<Props> = ({
             onClick={() => handleVote(Vote.PLUS)}
             disabled={canVote}
           >
-            <NorthIcon
+            <ThumbUpOffAltIcon
               sx={{
                 color: canVote ? 'grey' : 'white',
                 cursor: canVote ? 'initial' : 'pointer',
@@ -170,7 +170,7 @@ export const CommentCard: FC<Props> = ({
             onClick={() => handleVote(Vote.MINUS)}
             disabled={canVote}
           >
-            <SouthIcon
+            <ThumbDownOffAltIcon
               sx={{
                 color: canVote ? 'grey' : 'white',
                 cursor: canVote ? 'initial' : 'pointer',
