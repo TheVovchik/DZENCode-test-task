@@ -18,12 +18,14 @@ type Context = {
   homepage: string,
   message: string,
   loadingError: boolean,
+  file: File | null,
   refreshCaptcha: () => void,
   changeCaptchaValue: (value: string) => void,
   changeUserName: (value: string) => void,
   changeEmail: (value: string) => void,
   changeHomepage: (value: string) => void,
   changeMessage: (value: string) => void,
+  uploadFile: (files: FileList | null) => void,
 };
 
 export const FormContext = createContext<Context>({
@@ -34,12 +36,14 @@ export const FormContext = createContext<Context>({
   homepage: '',
   message: '',
   loadingError: false,
+  file: null,
   refreshCaptcha: () => {},
   changeCaptchaValue: () => {},
   changeUserName: () => {},
   changeEmail: () => {},
   changeHomepage: () => {},
   changeMessage: () => {},
+  uploadFile: () => {},
 });
 
 export const FormProvider: FC<Props> = ({ children, quoted }) => {
@@ -50,6 +54,7 @@ export const FormProvider: FC<Props> = ({ children, quoted }) => {
   const [homepage, setHomepage] = useState('');
   const [message, setMessage] = useState(quoted);
   const [loadingError, setLoadingError] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   const loadCaptcha = async () => {
     try {
@@ -88,6 +93,14 @@ export const FormProvider: FC<Props> = ({ children, quoted }) => {
     setMessage(value);
   };
 
+  const uploadFile = (
+    files: FileList | null,
+  ) => {
+    if (files) {
+      setFile(files[0]);
+    }
+  };
+
   const refreshCaptcha = () => {
     loadCaptcha();
     setCaptchaValue('');
@@ -105,12 +118,14 @@ export const FormProvider: FC<Props> = ({ children, quoted }) => {
     homepage,
     message,
     loadingError,
+    file,
     refreshCaptcha,
     changeCaptchaValue,
     changeUserName,
     changeEmail,
     changeHomepage,
     changeMessage,
+    uploadFile,
   };
 
   return (

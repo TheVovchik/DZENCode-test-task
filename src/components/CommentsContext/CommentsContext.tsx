@@ -13,6 +13,7 @@ type Props = {
 };
 
 type Context = {
+  loading: boolean,
   comments: Comment[],
   commentsLoadingError: boolean,
   sortBy: SortBy,
@@ -23,6 +24,7 @@ type Context = {
 };
 
 export const CommentsContext = createContext<Context>({
+  loading: false,
   comments: [],
   commentsLoadingError: false,
   sortBy: SortBy.NONE,
@@ -33,6 +35,7 @@ export const CommentsContext = createContext<Context>({
 });
 
 export const CommentsProvider: FC<Props> = ({ children }) => {
+  const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsLoadingError, setCommentsLoadingError] = useState(false);
   const [ip, setIp] = useState('');
@@ -40,13 +43,17 @@ export const CommentsProvider: FC<Props> = ({ children }) => {
   const [order, setOrder] = useState<Order>(Order.ASC);
 
   const loadComments = async () => {
+    setLoading(true);
+
     try {
       const commentsFromApi = await getComments();
 
       setCommentsLoadingError(false);
       setComments(commentsFromApi);
+      setLoading(false);
     } catch (error) {
       setCommentsLoadingError(true);
+      setLoading(false);
 
       if (axios.isAxiosError(error)) {
         throw error;
@@ -84,6 +91,7 @@ export const CommentsProvider: FC<Props> = ({ children }) => {
   }, []);
 
   const contextValue = {
+    loading,
     comments,
     commentsLoadingError,
     sortBy,

@@ -1,4 +1,8 @@
-import { FC, memo, useContext } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {
+  FC, memo, useContext, useEffect,
+} from 'react';
+import { Button } from '@mui/material';
 import { FormContext } from '../../FormContext';
 import './FormControl.scss';
 
@@ -12,6 +16,8 @@ export const FormControl: FC<Props> = memo(({ showModal }) => {
     userName,
     email,
     message,
+    file,
+    uploadFile,
   } = useContext(FormContext);
 
   const couldPost = email.length !== 0
@@ -19,8 +25,29 @@ export const FormControl: FC<Props> = memo(({ showModal }) => {
     && message.length !== 0
     && captchaValue.length !== 0;
 
+  // const handleInput = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  // ) => {
+  //   if (event.target.files) {
+  //     uploadFile(event.target.files);
+  //   }
+  // };
+
   return (
     <div className="form__management management">
+      {/* <Button
+        variant="contained"
+        component="label"
+      >
+        Upload
+        <input
+          hidden
+          accept=".jpg, .png, .gif, .txt"
+          type="file"
+          onChange={handleInput}
+        />
+      </Button> */}
+
       <button
         type="button"
         className="button is-warning"

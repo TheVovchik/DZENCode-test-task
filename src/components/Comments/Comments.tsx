@@ -1,23 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-loop-func */
 import {
   FC, useState, Fragment, useContext, useEffect,
 } from 'react';
-import { Button } from '@mui/material';
-import './Comments.scss';
-import 'bulma/css/bulma.min.css';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { v4 as uuidv4 } from 'uuid';
 import { Form } from '../Form';
 import { FormProvider } from '../FormContext';
 import { CommentsContext } from '../CommentsContext';
 import { CommentCard } from '../CommentCard';
 import { ControlPanel } from '../CommentsContext/ControlPanel';
-// import { sortComments } from '../../utils/sortComments';
+import './Comments.scss';
+import 'bulma/css/bulma.min.css';
 
 export const Comments: FC = () => {
   const {
-    comments, ip, sortBy, order,
+    loading, comments, ip,
   } = useContext(CommentsContext);
   const [readyComments, setReadyComments] = useState<JSX.Element[][]>([]);
   const [isPrimaryForm, setIsPrimaryForm] = useState(false);
@@ -144,17 +142,21 @@ export const Comments: FC = () => {
         magni facere soluta quos explicabo beatae.
       </div>
 
-      <Button
+      <LoadingButton
+        onClick={showForm}
+        loading={loading}
+        loadingIndicator="Loading…"
         variant="contained"
         size="large"
         sx={{
           backgroundColor: isPrimaryForm ? 'grey' : 'primary',
           marginBottom: '20px',
         }}
-        onClick={showForm}
       >
-        {isPrimaryForm ? 'Close form' : 'Leave a comment'}
-      </Button>
+        <span>
+          {isPrimaryForm ? 'Close form' : 'Leave a comment'}
+        </span>
+      </LoadingButton>
 
       {isPrimaryForm && (
         <FormProvider quoted="">
